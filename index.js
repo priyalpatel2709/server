@@ -4,7 +4,7 @@ const cros = require("cors");
 const socketIO = require("socket.io");
 
 const app = express();
-const port =process.env.PORT;
+const port = process.env.PORT;
 const users = [{}];
 
 app.use(cros());
@@ -31,12 +31,12 @@ io.on("connection", (socket) => {
       message: `welcome to the chat ${users[socket.id]}`
     });
   });
-  socket.on('message',({message,id})=>{
-   io.emit('sentMessage',{user :users[id],message,id})
-  })
+  socket.on("message", ({ message, id }) => {
+    io.emit("sentMessage", { user: users[id], message, id });
+  });
 
-
-  socket.on("disconnect", () => {
+  socket.on("disconnect", ({user} ) => {
+    users[socket.id] = user;
     socket.broadcast.emit("leave", {
       user: "Admin",
       message: ` ${users[socket.id]} has left `
@@ -46,5 +46,5 @@ io.on("connection", (socket) => {
 });
 
 server.listen(port, () => {
-  console.log(`http://localhost:${port}`);
+  console.log(`http://localhost:3009/`);
 });
