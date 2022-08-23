@@ -4,7 +4,7 @@ const cros = require("cors");
 const socketIO = require("socket.io");
 
 const app = express();
-const port = process.env.PORT;
+const port =process.env.PORT;
 const users = [{}];
 
 app.use(cros());
@@ -21,27 +21,26 @@ io.on("connection", (socket) => {
 
   socket.on("joined", ({ user }) => {
     users[socket.id] = user;
-
     console.log(`${user} has joined`);
-
     socket.broadcast.emit("userJoined", {
       user: "Admin",
       message: `${users[socket.id]} has joined`
     });
-
     socket.emit("welcome", {
       user: "Admin",
       message: `welcome to the chat ${users[socket.id]}`
     });
-
+    socket.emit("typing", {
+      user: `Admin`,
+      message: `${users[socket.id]} is typing`
+    });
   });
+  socket.on('message',({message,id})=>{
+   io.emit('sentMessage',{user :users[id],message,id})
+  })
 
-  socket.on("message", ({ message, id }) => {
-    io.emit("sentMessage", { user: users[id], message, id });
-  });
 
-  socket.on("disconnect", ({user} ) => {
-    users[socket.id] = user;
+  socket.on("disconnect", () => {
     socket.broadcast.emit("leave", {
       user: "Admin",
       message: ` ${users[socket.id]} has left `
@@ -51,5 +50,7 @@ io.on("connection", (socket) => {
 });
 
 server.listen(port, () => {
-  console.log(`http://localhost:3009/`);
+  console.log(`http://localhost:4000`);
 });
+
+
