@@ -67,10 +67,10 @@ app.get("/", (req, res) => {
   res.send("HELL ITS WORKING");
 });
 
-const server = http.createServer(app);
+const server =http.createServer(app);
 
 const io = socketIO(server);
-var clients = 0;
+let clients = 0;
 io.on("connection", (socket) => {
   console.log("New Connection ");
   clients++;
@@ -81,8 +81,11 @@ io.on("connection", (socket) => {
   });
   socket.on("joined", ({ user }) => {
     users[socket.id] = user;
-    console.log(`${user} has joined`);
-
+    // console.log(`${user} has joined`);
+    socket.emit("welcome", {
+      user: "Admin",
+      message: `welcome to the chat ${users[socket.id]}`
+    });
     io.sockets.emit("joinandleft", {
       user: "Admin",
       message: `${user} has joined`,
@@ -95,10 +98,7 @@ io.on("connection", (socket) => {
         m: user
       });
     });
-    socket.emit("welcome", {
-      user: "Admin",
-      message: `welcome to the chat ${users[socket.id]}`
-    });
+
   });
   socket.on("message", ({ message, id }) => {
     io.emit("sentMessage", { user: users[id], message, id });
@@ -109,7 +109,7 @@ io.on("connection", (socket) => {
 });
 
 server.listen(port, () => {
-  console.log(`http://localhost:${port}`);
+  console.log(`http://localhost:4000`);
 });
 
 
